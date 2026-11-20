@@ -6,24 +6,32 @@ import { Repository } from 'typeorm';
 
 @Injectable()
 export class OrdersRepository {
-    constructor(
-        @InjectRepository(Order)
-        private readonly repository: Repository<Order>,
-    ) {}
+  constructor(
+    @InjectRepository(Order)
+    private readonly repository: Repository<Order>,
+  ) {}
 
-    async save(order: Order): Promise<Order> {
-        return this.repository.save(order);
-    }
+  async save(order: Order): Promise<Order> {
+    return this.repository.save(order);
+  }
 
-    async findAllByStatus(status: OrderStatus): Promise<Order[]> {
-        return this.repository.findBy({ status });
-    }
+  async findAll(): Promise<Order[]> {
+    return this.repository.find({ relations: { guest: true } });
+  }
 
-    async findById(id: number): Promise<Order | null> {
-        return this.repository.findOneBy({ id });
-    }
+  async findAllByStatus(status: OrderStatus): Promise<Order[]> {
+    return this.repository.findBy({ status });
+  }
 
-    async deleteById(id: number): Promise<void> {
-        await this.repository.delete(id);
-    }
+  async findById(id: number): Promise<Order | null> {
+    return this.repository.findOne({
+      where: { id },
+      relations: { guest: true },
+    });
+  }
+
+
+  async deleteById(id: number): Promise<void> {
+    await this.repository.delete(id);
+  }
 }

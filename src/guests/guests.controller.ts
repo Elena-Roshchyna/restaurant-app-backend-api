@@ -1,55 +1,35 @@
 import {
-    Controller,
-    Post,
-    Body,
-    Get,
-    Param,
-    ParseIntPipe,
-    Patch,
-    HttpCode,
-    HttpStatus,
-    Delete,
+  Body,
+  Controller,
+  Get,
+  Param,
+  ParseIntPipe,
+  Post,
 } from '@nestjs/common';
-import { Guest } from './guest.entity.js';
+import { ApiTags } from '@nestjs/swagger';
+import { GuestsService } from './guests.service.js';
+import { GuestDto } from './dto/guest.dto.js';
+import { GuestSaveDto } from './dto/guest.save-dto.js';
 
+@ApiTags('guests')
 @Controller('guests')
 export class GuestsController {
-    @Post()
-    create(@Body() guest: Guest): Guest {
-        console.log('Saved guest: ', guest);
-        guest.id = 5;
-        return guest;
-    }
+  constructor(private readonly service: GuestsService) {}
 
-    @Get()
-    getAll(): Guest[] {
-        const guest1: Guest = new Guest();
-        guest1.fullName = 'Anna Ivanova';
-        const guest2: Guest = new Guest();
-        guest2.fullName = 'Ivan Petrov';
+  @Get()
+  async getAll(): Promise<GuestDto[]> {
+    return await this.service.findAll();
+  }
 
-        return [guest1, guest2];
-    }
+  @Get(':id')
+  async getById(@Param('id', ParseIntPipe) id: number): Promise<GuestDto> {
+    return await this.service.findById(id);
+  }
 
-    @Get(':id')
-    getById(@Param('id', ParseIntPipe) id: number): Guest {
-        console.log(id);
-        const guest: Guest = new Guest();
-        guest.fullName = 'Maria Sidorova';
-        return guest;
-    }
-
-    @Patch(':id')
-    @HttpCode(HttpStatus.NO_CONTENT)
-    update(@Param('id', ParseIntPipe) id: number, @Body() guest: Guest): void {
-        console.log(id);
-        console.log(guest);
-    }
-
-    @Delete(':id')
-    @HttpCode(HttpStatus.NO_CONTENT)
-    deleteById(@Param('id', ParseIntPipe) id: number): void {
-        console.log(id);
-    }
+  @Post()
+  async create(@Body() saveDto: GuestSaveDto): Promise<GuestDto> {
+    return await this.service.create(saveDto);
+  }
 }
+
 

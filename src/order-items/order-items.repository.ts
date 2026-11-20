@@ -14,13 +14,25 @@ export class OrderItemsRepository {
         return this.repository.save(item);
     }
 
-    async findByOrderId(orderId: number): Promise<OrderItem[]> {
+  async findAll(): Promise<OrderItem[]> {
+    return this.repository.find({
+      relations: { order: { guest: true }, dish: true },
+    });
+  }
+
+
+
+  async findByOrderId(orderId: number): Promise<OrderItem[]> {
         return this.repository.findBy({ order: { id: orderId } });
     }
 
-    async findById(id: number): Promise<OrderItem | null> {
-        return this.repository.findOneBy({ id });
-    }
+  async findById(id: number): Promise<OrderItem | null> {
+    return this.repository.findOne({
+      where: { id },
+      relations: { order: { guest: true }, dish: true },
+    });
+  }
+
 
     async deleteById(id: number): Promise<void> {
         await this.repository.delete(id);
